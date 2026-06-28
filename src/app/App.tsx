@@ -5,6 +5,7 @@ import { Skills } from "./components/Skills";
 import { Contact } from "./components/Contact";
 import { Footer } from "./components/Footer";
 import { CosmicBackground } from "./components/CosmicBackground";
+import { Chatbot } from "./components/Chatbot";
 
 export default function App() {
   return (
@@ -21,6 +22,9 @@ export default function App() {
         <Contact />
         <Footer />
       </div>
+
+      {/* Floating Chat Assistant */}
+      <Chatbot />
     </div>
   );
 }
