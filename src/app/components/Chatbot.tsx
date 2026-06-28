@@ -500,14 +500,58 @@ export function Chatbot() {
       </AnimatePresence>
 
       {/* Floating Toggle Button */}
-      <motion.button
-        onClick={() => setIsOpen(!isOpen)}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        className="w-14 h-14 rounded-full bg-gradient-to-r from-violet-600 via-fuchsia-600 to-cyan-500 text-white flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.5)] border border-white/15 focus:outline-none hover:shadow-[0_0_30px_rgba(139,92,246,0.8)] transition-shadow cursor-pointer"
-      >
-        {isOpen ? <X className="w-6 h-6" /> : <MessageSquare className="w-6 h-6" />}
-      </motion.button>
+      <div className="relative">
+        {/* Animated pulse rings (only when closed) */}
+        {!isOpen && (
+          <>
+            <span className="absolute inset-0 rounded-full bg-gradient-to-r from-violet-500 to-cyan-500 opacity-30 animate-ping" />
+            <span
+              className="absolute inset-[-4px] rounded-full border-2 border-violet-500/40 animate-pulse"
+            />
+          </>
+        )}
+
+        <motion.button
+          onClick={() => setIsOpen(!isOpen)}
+          whileHover={{ scale: 1.12 }}
+          whileTap={{ scale: 0.9 }}
+          className="relative w-14 h-14 rounded-full bg-gradient-to-br from-violet-600 via-fuchsia-600 to-cyan-500 text-white flex items-center justify-center shadow-[0_4px_25px_rgba(139,92,246,0.5)] border-2 border-white/20 focus:outline-none hover:shadow-[0_4px_35px_rgba(139,92,246,0.8)] transition-shadow cursor-pointer overflow-hidden"
+        >
+          <AnimatePresence mode="wait">
+            {isOpen ? (
+              <motion.div
+                key="close"
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 90, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <X className="w-6 h-6" />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="cat"
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.5, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <img
+                  src="/favicon.png"
+                  alt="Chat"
+                  className="w-full h-full object-cover absolute inset-0 rounded-full"
+                />
+                <MessageSquare className="w-5 h-5 relative z-10 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.button>
+
+        {/* Notification dot — outside button to avoid overflow-hidden clipping */}
+        {!isOpen && (
+          <span className="absolute top-0 right-0 z-10 w-3.5 h-3.5 bg-green-400 rounded-full border-2 border-[#050510] shadow-[0_0_6px_rgba(74,222,128,0.6)] pointer-events-none" />
+        )}
+      </div>
     </div>
   );
 }
