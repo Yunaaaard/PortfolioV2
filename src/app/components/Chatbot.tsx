@@ -25,9 +25,11 @@ export function Chatbot() {
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [showReplies, setShowReplies] = useState(true);
+  const [score, setScore] = useState({ user: 0, bot: 0 });
   const [currentReplies, setCurrentReplies] = useState<string[]>([
     "Skills 🛠️",
     "Projects 📁",
+    "Play a game! 🎮",
     "Get in touch 🔗",
     "Burger & milk tea? 🍔",
   ]);
@@ -38,27 +40,27 @@ export function Chatbot() {
     "Skills 🛠️": {
       label: "Skills 🛠️",
       response: "Leonard is a Software Engineer specializing in modern frontend and full-stack systems. He loves working with React, TypeScript, Vite, Tailwind CSS, and Node.js. He also has solid foundations in OOP, Java, and Machine Learning!",
-      nextReplies: ["Projects 📁", "Get in touch 🔗", "Back to Start 🔄"],
+      nextReplies: ["Projects 📁", "Play a game! 🎮", "Get in touch 🔗", "Back to Start 🔄"],
     },
     "Projects 📁": {
       label: "Projects 📁",
       response: "He has built several awesome apps! Notable ones include: a PACMAN game integrated with Machine Learning (Java), EcoFarm, Cofinoy, and this very portfolio! Scroll down to the Projects section to view live GitHub links.",
-      nextReplies: ["Skills 🛠️", "Get in touch 🔗", "Back to Start 🔄"],
+      nextReplies: ["Skills 🛠️", "Play a game! 🎮", "Get in touch 🔗", "Back to Start 🔄"],
     },
     "Get in touch 🔗": {
       label: "Get in touch 🔗",
       response: "You can reach out to Leonard directly using the Contact Form on this page! Alternatively, email him at tarimanleonard28@gmail.com, or check out his Github/LinkedIn links in the footer.",
-      nextReplies: ["Skills 🛠️", "Projects 📁", "Back to Start 🔄"],
+      nextReplies: ["Skills 🛠️", "Projects 📁", "Play a game! 🎮", "Back to Start 🔄"],
     },
     "Burger & milk tea? 🍔": {
       label: "Burger & milk tea? 🍔",
       response: "Ah, yes! 'Milkte, borjer at chaka frays' (Milk tea, burger, and chocolate fries) is Leonard's ultimate developer fuel. Legend has it that consuming these increases his programming speed by 400%!",
-      nextReplies: ["Skills 🛠️", "Get in touch 🔗", "Back to Start 🔄"],
+      nextReplies: ["Skills 🛠️", "Play a game! 🎮", "Get in touch 🔗", "Back to Start 🔄"],
     },
     "Back to Start 🔄": {
       label: "Back to Start 🔄",
       response: "Sure, let's start over! What else can I help you find?",
-      nextReplies: ["Skills 🛠️", "Projects 📁", "Get in touch 🔗", "Burger & milk tea? 🍔"],
+      nextReplies: ["Skills 🛠️", "Projects 📁", "Play a game! 🎮", "Get in touch 🔗", "Burger & milk tea? 🍔"],
     },
   };
 
@@ -68,23 +70,110 @@ export function Chatbot() {
   }, [messages, isTyping]);
 
   const handleReplyClick = (replyKey: string) => {
-    const data = quickRepliesMap[replyKey];
-    if (!data) return;
-
     // Add user message
     const userMsgId = Math.random().toString(36).substring(7);
-    setMessages((prev) => [...prev, { id: userMsgId, sender: "user", text: data.label }]);
+    setMessages((prev) => [...prev, { id: userMsgId, sender: "user", text: replyKey }]);
     setShowReplies(false);
 
     // Simulate typing delay
     setIsTyping(true);
+
     setTimeout(() => {
       setIsTyping(false);
       const botMsgId = Math.random().toString(36).substring(7);
-      setMessages((prev) => [...prev, { id: botMsgId, sender: "bot", text: data.response }]);
-      if (data.nextReplies) {
-        setCurrentReplies(data.nextReplies);
+
+      // Handle RPS mini-game choices
+      if (replyKey === "Play a game! 🎮") {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: botMsgId,
+            sender: "bot",
+            text: "Awesome! Let's play Rock Paper Scissors! 🪨 📄 ✂️ Choose your weapon:",
+          },
+        ]);
+        setCurrentReplies(["Rock 🪨", "Paper 📄", "Scissors ✂️", "Exit Game 🚪"]);
+      } else if (
+        replyKey === "Rock 🪨" ||
+        replyKey === "Paper 📄" ||
+        replyKey === "Scissors ✂️"
+      ) {
+        const weapons = ["Rock 🪨", "Paper 📄", "Scissors ✂️"];
+        const userChoice = replyKey.split(" ")[0]; // "Rock", "Paper", "Scissors"
+        const botWeapon = weapons[Math.floor(Math.random() * weapons.length)];
+        const botChoice = botWeapon.split(" ")[0];
+
+        let result = "";
+        let newScore = { ...score };
+
+        if (userChoice === botChoice) {
+          result = `It's a draw! 🤝 We both chose ${botWeapon}.`;
+        } else if (
+          (userChoice === "Rock" && botChoice === "Scissors") ||
+          (userChoice === "Paper" && botChoice === "Rock") ||
+          (userChoice === "Scissors" && botChoice === "Paper")
+        ) {
+          newScore.user += 1;
+          result = `You win! 🎉 You chose ${replyKey} and I chose ${botWeapon}.`;
+        } else {
+          newScore.bot += 1;
+          result = `I win! 😈 You chose ${replyKey} and I chose ${botWeapon}.`;
+        }
+
+        setScore(newScore);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: botMsgId,
+            sender: "bot",
+            text: `${result}\n\n🏆 Score - You: ${newScore.user} | Me: ${newScore.bot}`,
+          },
+        ]);
+        setCurrentReplies([
+          "Rock 🪨",
+          "Paper 📄",
+          "Scissors ✂️",
+          "Reset Score 🔄",
+          "Exit Game 🚪",
+        ]);
+      } else if (replyKey === "Reset Score 🔄") {
+        setScore({ user: 0, bot: 0 });
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: botMsgId,
+            sender: "bot",
+            text: "Score reset to 0 - 0! Let's go again. Choose your weapon:",
+          },
+        ]);
+        setCurrentReplies(["Rock 🪨", "Paper 📄", "Scissors ✂️", "Exit Game 🚪"]);
+      } else if (replyKey === "Exit Game 🚪") {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: botMsgId,
+            sender: "bot",
+            text: `GG! The final score was - You: ${score.user} | Me: ${score.bot}. What would you like to know next?`,
+          },
+        ]);
+        setCurrentReplies([
+          "Skills 🛠️",
+          "Projects 📁",
+          "Play a game! 🎮",
+          "Get in touch 🔗",
+          "Burger & milk tea? 🍔",
+        ]);
+      } else {
+        // Standard FAQ flow
+        const data = quickRepliesMap[replyKey];
+        if (data) {
+          setMessages((prev) => [...prev, { id: botMsgId, sender: "bot", text: data.response }]);
+          if (data.nextReplies) {
+            setCurrentReplies(data.nextReplies);
+          }
+        }
       }
+
       setShowReplies(true);
     }, 1000);
   };
