@@ -20,7 +20,7 @@ export function About() {
     {
       icon: Sparkles,
       label: "Interests",
-      value: "AI & Full-Stack Systems",
+      value: "Thriving Technologies",
       color: "text-fuchsia-400"
     }
   ];

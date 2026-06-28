@@ -1,15 +1,8 @@
 import { useEffect, useRef } from "react";
 
-/**
- * Renders a full-page cosmic / galactic background with:
- * - A canvas layer that paints twinkling stars
- * - CSS nebula clouds that float slowly
- * - Shooting-star streaks that fire at random intervals
- */
 export function CosmicBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  /* ---------- Star-field canvas ---------- */
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -39,7 +32,7 @@ export function CosmicBackground() {
     const generateStars = () => {
       stars.length = 0;
       const area = canvas.width * canvas.height;
-      const count = Math.floor(area / 3000); // density
+      const count = Math.floor(area / 3000);
       for (let i = 0; i < count; i++) {
         stars.push({
           x: Math.random() * canvas.width,
@@ -63,7 +56,6 @@ export function CosmicBackground() {
         ctx.fillStyle = `rgba(255,255,255,${alpha})`;
         ctx.fill();
 
-        // tiny glow for brighter stars
         if (star.radius > 1) {
           ctx.beginPath();
           ctx.arc(star.x, star.y, star.radius * 2.5, 0, Math.PI * 2);
@@ -77,7 +69,6 @@ export function CosmicBackground() {
     resize();
     animId = requestAnimationFrame(draw);
 
-    // Listen to window resize
     window.addEventListener("resize", resize);
 
     return () => {
@@ -88,17 +79,14 @@ export function CosmicBackground() {
 
   return (
     <div className="cosmic-bg">
-      {/* Star canvas */}
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full"
         style={{ mixBlendMode: "screen" }}
       />
 
-      {/* Deep-space radial gradient base */}
       <div className="absolute inset-0 cosmic-base-gradient" />
 
-      {/* Nebula clouds — large, slow, soft */}
       <div className="nebula nebula-1" />
       <div className="nebula nebula-2" />
       <div className="nebula nebula-3" />
@@ -106,7 +94,6 @@ export function CosmicBackground() {
       <div className="nebula nebula-5" />
       <div className="nebula nebula-6" />
 
-      {/* Shooting stars — purely CSS-animated streaks */}
       <div className="shooting-star shooting-star-1" />
       <div className="shooting-star shooting-star-2" />
       <div className="shooting-star shooting-star-3" />

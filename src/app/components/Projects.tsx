@@ -49,7 +49,7 @@ export function Projects() {
     },
     {
       title: "PACMAN",
-      description: "A simple PACMAN game with AI using Java - Object Oriented Programming",
+      description: "A simple PACMAN game with Machine Learning using Java - Object Oriented Programming",
       image: pacmanImg,
       tags: ["Java", "Machine Learning", "OOP"],
       github: "https://github.com/Yunaaaard/Pac-man",

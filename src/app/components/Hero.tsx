@@ -17,8 +17,60 @@ export function Hero() {
           </RevealItem>
 
           <RevealItem>
-            <p className="text-xl md:text-2xl text-zinc-300 mb-8">
-              BSIT Graduate & Software Engineer
+            <p className="text-xl md:text-2xl text-zinc-300 mb-8 select-none">
+              {"I love "}
+              <motion.span
+                className="inline-block cursor-pointer text-violet-400 font-semibold hover:drop-shadow-[0_0_12px_rgba(167,139,250,0.8)]"
+                whileHover={{ 
+                  scale: 1.25, 
+                  rotate: [0, -10, 10, -10, 0],
+                  transition: { duration: 0.5 }
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                milkte
+              </motion.span>
+              {" "}
+              <motion.span
+                className="inline-block cursor-pointer text-fuchsia-400 font-semibold hover:drop-shadow-[0_0_12px_rgba(232,121,249,0.8)]"
+                whileHover={{ 
+                  scale: 1.25, 
+                  y: [0, -10, 0],
+                  transition: { 
+                    duration: 0.6,
+                    repeat: Infinity,
+                    repeatType: "mirror"
+                  }
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                borjer
+              </motion.span>
+              {" at "}
+              <motion.span
+                className="inline-block cursor-pointer text-cyan-400 font-semibold hover:drop-shadow-[0_0_12px_rgba(34,211,238,0.8)]"
+                whileHover={{ 
+                  scale: 1.25, 
+                  skewX: [0, 15, -15, 15, 0],
+                  transition: { duration: 0.5 }
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                chaka
+              </motion.span>
+              {" "}
+              <motion.span
+                className="inline-block cursor-pointer text-amber-400 font-semibold hover:drop-shadow-[0_0_12px_rgba(251,191,36,0.8)]"
+                whileHover={{ 
+                  scale: 1.25, 
+                  rotate: 360,
+                  transition: { duration: 0.6 }
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                frays
+              </motion.span>
+              {"."}
             </p>
           </RevealItem>
 
