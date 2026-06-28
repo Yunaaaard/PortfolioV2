@@ -109,22 +109,29 @@
 .shooting-star-1 {
   top: 8%; left: 15%;
   transform: rotate(-35deg);
-  animation: shoot 6s ease-in-out infinite;
-  animation-delay: 1s;
+  animation: shoot 3s ease-in-out infinite;
+  animation-delay: 0.5s;
 }
 
 .shooting-star-2 {
   top: 45%; left: 60%;
   transform: rotate(-30deg);
-  animation: shoot 8s ease-in-out infinite;
-  animation-delay: 4s;
+  animation: shoot 4s ease-in-out infinite;
+  animation-delay: 1.5s;
 }
 
 .shooting-star-3 {
   top: 72%; left: 25%;
   transform: rotate(-40deg);
-  animation: shoot 10s ease-in-out infinite;
-  animation-delay: 7s;
+  animation: shoot 4.5s ease-in-out infinite;
+  animation-delay: 2.5s;
+}
+
+.shooting-star-4 {
+  top: 25%; left: 75%;
+  transform: rotate(-35deg);
+  animation: shoot 3.5s ease-in-out infinite;
+  animation-delay: 1s;
 }
 
 @keyframes shoot {
