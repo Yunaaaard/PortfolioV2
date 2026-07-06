@@ -58,7 +58,7 @@ export function Contact() {
             </h2>
           </RevealItem>
           <RevealItem>
-            <p className="text-lg text-zinc-400 mb-16 text-center max-w-2xl mx-auto">
+            <p className="text-lg text-zinc-400 mb-16 text-center max-w-2xl mx-auto font-mono-jb text-[15px]">
               Have a project in mind or just want to chat? Feel free to reach out!
             </p>
           </RevealItem>
@@ -86,7 +86,7 @@ export function Contact() {
                     </div>
                   ))}
                 </div>
-                <p className="text-zinc-500 text-sm leading-relaxed">
+                <p className="text-zinc-500 text-xs leading-relaxed font-mono-jb">
                   {"I'm always interested in hearing about new projects and opportunities. "}
                   {"Whether you have a question or just want to say hi, I'll try my best to get back to you!"}
                 </p>

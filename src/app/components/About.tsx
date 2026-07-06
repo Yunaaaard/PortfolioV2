@@ -1,6 +1,71 @@
+import { useState, useEffect, useRef } from "react";
 import { GraduationCap, Sparkles, Code, User } from "lucide-react";
 import { SectionReveal, RevealItem } from "./SectionReveal";
 import profileImg from "../assets/images/GRAD-PIC.png";
+
+function TypewriterText({
+  text,
+  className,
+  speed = 18,
+  startDelay = 200,
+}: {
+  text: string;
+  className?: string;
+  speed?: number;
+  startDelay?: number;
+}) {
+  const [displayed, setDisplayed] = useState("");
+  const [started, setStarted] = useState(false);
+  const ref = useRef<HTMLParagraphElement>(null);
+
+  // Observe visibility using IntersectionObserver
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !started) {
+          setStarted(true);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [started]);
+
+  // Type characters one by one
+  useEffect(() => {
+    if (!started) return;
+
+    const timeout = setTimeout(() => {
+      let i = 0;
+      const interval = setInterval(() => {
+        i++;
+        setDisplayed(text.slice(0, i));
+        if (i >= text.length) clearInterval(interval);
+      }, speed);
+      return () => clearInterval(interval);
+    }, startDelay);
+
+    return () => clearTimeout(timeout);
+  }, [started, text, speed, startDelay]);
+
+  return (
+    <div ref={ref} className={`relative ${className ?? ""}`}>
+      {/* Invisible full text to reserve final layout height */}
+      <span className="invisible" aria-hidden="true">{text}</span>
+      {/* Visible typewriter overlay */}
+      <span className="absolute inset-0">
+        {displayed}
+        {displayed.length < text.length && (
+          <span className="inline-block w-[2px] h-[1em] bg-violet-400 ml-[1px] align-middle animate-pulse" />
+        )}
+      </span>
+    </div>
+  );
+}
 
 export function About() {
 
@@ -24,6 +89,9 @@ export function About() {
       color: "text-fuchsia-400"
     }
   ];
+
+  const bio1 = "Motivated and results-driven Information Technology graduate seeking a challenging position as a Software Developer. Offering a strong foundation in software engineering, systems design, and full-stack development, with a proven ability to build scalable solutions.";
+  const bio2 = "I enjoy solving complex technical problems, designing beautiful user interfaces, and learning new languages and architectures. My goal is to build software that is both elegant on the inside and impactful to users.";
 
   return (
     <section id="about" className="py-28 relative">
@@ -82,12 +150,18 @@ export function About() {
                   <h3 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
                     Software Developer & IT Graduate
                   </h3>
-                  <p className="text-zinc-400 leading-relaxed">
-                    Motivated and results-driven Information Technology graduate seeking a challenging position as a Software Developer. Offering a strong foundation in software engineering, systems design, and full-stack development, with a proven ability to build scalable solutions.
-                  </p>
-                  <p className="text-zinc-400 leading-relaxed">
-                    I enjoy solving complex technical problems, designing beautiful user interfaces, and learning new languages and architectures. My goal is to build software that is both elegant on the inside and impactful to users.
-                  </p>
+                  <TypewriterText
+                    text={bio1}
+                    className="text-zinc-400 leading-relaxed font-mono-jb text-[14px]"
+                    speed={35}
+                    startDelay={300}
+                  />
+                  <TypewriterText
+                    text={bio2}
+                    className="text-zinc-400 leading-relaxed font-mono-jb text-[14px]"
+                    speed={35}
+                    startDelay={300 + bio1.length * 35 + 500}
+                  />
                 </div>
               </RevealItem>
 

@@ -11,6 +11,8 @@ interface SectionRevealProps {
   /** Stagger children by this amount (seconds) */
   stagger?: number;
   className?: string;
+  /** Trigger animation only once */
+  once?: boolean;
 }
 
 const directionOffsets: Record<Direction, { x: number; y: number }> = {
@@ -42,12 +44,13 @@ export function SectionReveal({
   delay = 0,
   stagger = 0.08,
   className,
+  once = false,
 }: SectionRevealProps) {
   return (
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, amount: 0.15 }}
+      viewport={{ once, amount: 0.15 }}
       variants={{
         hidden: {},
         visible: {

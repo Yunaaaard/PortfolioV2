@@ -38,6 +38,13 @@ export function CosmicBackground() {
 
     const stars: Star[] = [];
 
+    interface Rocket {
+      x: number; y: number; size: number; speed: number;
+      angle: number; depth: number;
+    }
+
+    const rockets: Rocket[] = [];
+
     const PLANET_CONFIGS = [
       {
         color: "#3b1f6e", ringColor: "#7c4dbd", hasRing: true, ringTilt: 0.3,
@@ -73,6 +80,7 @@ export function CosmicBackground() {
       canvas.height = window.innerHeight;
       generateStars();
       generatePlanets();
+      generateRockets();
     };
 
     const generatePlanets = () => {
@@ -131,6 +139,20 @@ export function CosmicBackground() {
           twinkleSpeed: Math.random() * 0.002 + 0.001,
           twinkleOffset: Math.random() * Math.PI * 2,
           depth: Math.random(),
+        });
+      }
+    };
+
+    const generateRockets = () => {
+      rockets.length = 0;
+      for (let i = 0; i < 3; i++) {
+        rockets.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: 7 + Math.random() * 5, // size range: 7px to 12px
+          speed: 0.35 + Math.random() * 0.4,
+          angle: -Math.PI / 4 + (Math.random() * 0.12 - 0.06), // roughly 45 degrees up-right
+          depth: 0.3 + Math.random() * 0.7,
         });
       }
     };
@@ -282,12 +304,95 @@ export function CosmicBackground() {
       ctx.restore();
     };
 
-    const drawPlanet = (planet: Planet, time: number) => {
+    const drawRocket = (rx: number, ry: number, size: number, angle: number) => {
+      ctx.save();
+      ctx.translate(rx, ry);
+      ctx.rotate(angle);
+      
+      // Flame (flickering booster trail)
+      const flameHeight = size * (1.2 + Math.random() * 0.7);
+      ctx.fillStyle = Math.random() > 0.5 ? "#f97316" : "#eab308";
+      ctx.beginPath();
+      ctx.moveTo(-size * 0.3, size * 0.8);
+      ctx.lineTo(0, size * 0.8 + flameHeight);
+      ctx.lineTo(size * 0.3, size * 0.8);
+      ctx.closePath();
+      ctx.fill();
+
+      // Rocket fins (red)
+      ctx.fillStyle = "#ef4444";
+      // Left fin
+      ctx.beginPath();
+      ctx.moveTo(-size * 0.6, size * 0.2);
+      ctx.lineTo(-size * 1.3, size * 1.1);
+      ctx.lineTo(-size * 0.6, size * 0.8);
+      ctx.closePath();
+      ctx.fill();
+      // Right fin
+      ctx.beginPath();
+      ctx.moveTo(size * 0.6, size * 0.2);
+      ctx.lineTo(size * 1.3, size * 1.1);
+      ctx.lineTo(size * 0.6, size * 0.8);
+      ctx.closePath();
+      ctx.fill();
+
+      // Rocket main body capsule (white/silver)
+      ctx.fillStyle = "#f1f5f9";
+      ctx.beginPath();
+      ctx.moveTo(0, -size * 1.8); // nose tip
+      ctx.quadraticCurveTo(size * 0.65, -size * 0.8, size * 0.65, size * 0.8);
+      ctx.lineTo(-size * 0.65, size * 0.8);
+      ctx.quadraticCurveTo(-size * 0.65, -size * 0.8, 0, -size * 1.8);
+      ctx.closePath();
+      ctx.fill();
+
+      // Nose cone tip (red)
+      ctx.fillStyle = "#ef4444";
+      ctx.beginPath();
+      ctx.moveTo(0, -size * 1.8);
+      ctx.quadraticCurveTo(size * 0.5, -size * 1.2, size * 0.5, -size * 0.8);
+      ctx.lineTo(-size * 0.5, -size * 0.8);
+      ctx.quadraticCurveTo(-size * 0.5, -size * 1.2, 0, -size * 1.8);
+      ctx.closePath();
+      ctx.fill();
+
+      // Circular cockpit window (neon cyan)
+      ctx.fillStyle = "#06b6d4";
+      ctx.beginPath();
+      ctx.arc(0, -size * 0.1, size * 0.3, 0, Math.PI * 2);
+      ctx.fill();
+      // Window rim
+      ctx.strokeStyle = "#475569";
+      ctx.lineWidth = size * 0.08;
+      ctx.stroke();
+
+      ctx.restore();
+    };
+
+    const drawPlanet = (planet: Planet, time: number, scrollY: number) => {
       const floatY = Math.sin(time * planet.floatSpeed + planet.floatOffset) * planet.floatAmplitude;
       const floatX = Math.cos(time * planet.floatSpeed * 0.7 + planet.floatOffset) * planet.floatAmplitude * 0.4;
+      
+      // Scroll parallax offset based on planet size
+      const scrollOffset = scrollY * (0.05 + planet.radius * 0.002);
+      
       const px = planet.x + floatX;
-      const py = planet.y + floatY;
+      let py = (planet.y + floatY - scrollOffset) % canvas.height;
+      if (py < 0) py += canvas.height;
+
       const r = planet.radius;
+
+      // Soft opacity fade near top/bottom edges for seamless wrapping
+      const margin = 120;
+      let alpha = 1;
+      if (py < margin) {
+        alpha = Math.max(0, py / margin);
+      } else if (py > canvas.height - margin) {
+        alpha = Math.max(0, (canvas.height - py) / margin);
+      }
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
 
       // Ring behind planet
       if (planet.hasRing && planet.ringColor) {
@@ -349,6 +454,8 @@ export function CosmicBackground() {
       // Cat on top of planet
       const catFns = [drawCatSitting, drawCatLoaf, drawCatStanding];
       catFns[planet.catType](px, py - r, planet.catScale);
+
+      ctx.restore(); // restore global alpha & canvas state
     };
 
     const onMouseMove = (e: MouseEvent) => { mouse.x = e.clientX; mouse.y = e.clientY; };
@@ -360,6 +467,8 @@ export function CosmicBackground() {
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+
       if (smoothMouse.x > 0 && smoothMouse.y > 0) {
         const glow = ctx.createRadialGradient(smoothMouse.x, smoothMouse.y, 0, smoothMouse.x, smoothMouse.y, INTERACT_RADIUS * 1.5);
         glow.addColorStop(0, "rgba(139, 92, 246, 0.06)");
@@ -369,16 +478,20 @@ export function CosmicBackground() {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
 
-      // Stars
+      // Stars with infinite scroll parallax
       for (const star of stars) {
+        // Star depth-based vertical scroll
+        let currentBaseY = (star.baseY - scrollY * (0.02 + star.depth * 0.12)) % canvas.height;
+        if (currentBaseY < 0) currentBaseY += canvas.height;
+
         const dx = smoothMouse.x - star.baseX;
-        const dy = smoothMouse.y - star.baseY;
+        const dy = smoothMouse.y - currentBaseY;
         const dist = Math.sqrt(dx * dx + dy * dy);
         const proximity = Math.max(0, 1 - dist / INTERACT_RADIUS);
         const pushStrength = proximity * 18 * star.depth;
         const angle = Math.atan2(dy, dx);
         star.x += (star.baseX - Math.cos(angle) * pushStrength - star.x) * 0.1;
-        star.y += (star.baseY - Math.sin(angle) * pushStrength - star.y) * 0.1;
+        star.y += (currentBaseY - Math.sin(angle) * pushStrength - star.y) * 0.1;
 
         const flicker = 0.5 + 0.5 * Math.sin(time * star.twinkleSpeed + star.twinkleOffset);
         const boostedOpacity = star.opacity * flicker + proximity * 0.5;
@@ -401,7 +514,41 @@ export function CosmicBackground() {
       }
 
       // Planets with cats
-      planets.forEach(p => drawPlanet(p, time));
+      planets.forEach(p => drawPlanet(p, time, scrollY));
+
+      // Rockets with infinite parallax scroll wrapping
+      for (const r of rockets) {
+        // Fly forward along vector
+        r.x += Math.cos(r.angle) * r.speed;
+        r.y += Math.sin(r.angle) * r.speed;
+
+        // Apply depth-based parallax scroll offset
+        const scrollOffset = scrollY * (0.04 + r.depth * 0.1);
+        let rx = r.x;
+        let ry = (r.y - scrollOffset) % canvas.height;
+        if (ry < 0) ry += canvas.height;
+
+        // Reset rocket when flying completely off-screen to the right
+        if (r.x > canvas.width + 80) {
+          r.x = -80;
+          r.y = Math.random() * canvas.height;
+        }
+
+        // Soft fade opacity near vertical borders for wrapping transparency
+        const margin = 80;
+        let alpha = 1;
+        if (ry < margin) {
+          alpha = Math.max(0, ry / margin);
+        } else if (ry > canvas.height - margin) {
+          alpha = Math.max(0, (canvas.height - ry) / margin);
+        }
+
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        // Nose points along motion vector: rotate rocket by (angle + 90 deg) because drawing nose points upwards
+        drawRocket(rx, ry, r.size, r.angle + Math.PI / 2);
+        ctx.restore();
+      }
 
       animId = requestAnimationFrame(draw);
     };

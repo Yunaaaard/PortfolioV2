@@ -135,6 +135,12 @@ export function Projects() {
   }, []);
 
   const handlePointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    // Don't drag-scroll if the user clicked a link or button
+    if (target.closest("a") || target.closest("button")) {
+      return;
+    }
+
     const track = trackRef.current;
     if (!track) return;
 
@@ -152,7 +158,7 @@ export function Projects() {
     const deltaX = e.clientX - dragStartXRef.current;
 
     // Only flag as "dragged" after a few pixels of movement
-    if (Math.abs(deltaX) > 4) {
+    if (Math.abs(deltaX) > 10) {
       hasDraggedRef.current = true;
     }
 
@@ -193,7 +199,7 @@ export function Projects() {
             </h2>
           </RevealItem>
           <RevealItem>
-            <p className="text-lg text-zinc-400 mb-16 text-center max-w-2xl mx-auto">
+            <p className="text-lg text-zinc-400 mb-16 text-center max-w-2xl mx-auto font-mono-jb text-[15px]">
               Here are some of my recent works that showcase my skills and passion for development.
             </p>
           </RevealItem>
@@ -232,7 +238,7 @@ export function Projects() {
                     </div>
                     <div className="p-6">
                       <h3 className="text-xl font-semibold text-white mb-2">{project.title}</h3>
-                      <p className="text-zinc-400 mb-4 text-sm leading-relaxed">{project.description}</p>
+                      <p className="text-zinc-400 mb-4 text-xs leading-relaxed font-mono-jb">{project.description}</p>
                       <div className="flex flex-wrap gap-2 mb-4">
                         {project.tags.map((tag) => (
                           <span
