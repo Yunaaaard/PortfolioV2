@@ -76,7 +76,7 @@ export function Footer() {
             © {new Date().getFullYear()} Leonard Tariman
           </p>
           <p className="text-zinc-600 text-xs font-mono tracking-wide italic">
-            Designed for the next useful conversation.
+            Just a kid with big dreams.
           </p>
         </div>
       </div>

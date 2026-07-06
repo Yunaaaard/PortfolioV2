@@ -76,11 +76,11 @@ export function Contact() {
                       <div>
                         <p className="text-sm text-zinc-500 mb-1">{info.label}</p>
                         {info.href ? (
-                          <a href={info.href} className="neon-icon text-zinc-200 transition-colors">
+                          <a href={info.href} className="neon-icon text-zinc-200 transition-colors font-mono-jb">
                             {info.value}
                           </a>
                         ) : (
-                          <p className="text-zinc-200">{info.value}</p>
+                          <p className="text-zinc-200 font-mono-jb">{info.value}</p>
                         )}
                       </div>
                     </div>

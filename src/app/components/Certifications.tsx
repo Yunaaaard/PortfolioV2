@@ -6,6 +6,8 @@ import { SectionReveal, RevealItem } from "./SectionReveal";
 // Import certificate images
 import mongodbCert from "../assets/certifications/leonard-tariman-7b9297ae-8ae9-46d5-b386-82d9421d34a5-certificate_page-0001.jpg";
 import vectorSearchCert from "../assets/certifications/leonard-tariman-c108ecf8-269c-4844-9110-a0df7efe2e35-certificate_page-0001.jpg";
+import SQLassociate from "../assets/certifications/SQL Associate - Twitter - Post.png";
+import GoogleCloud from "../assets/certifications/certificate1_page-0001.jpg";
 
 interface Certification {
   title: string;
@@ -26,7 +28,7 @@ const initialCertifications: Certification[] = [
     date: "Feb 23, 2025",
     credentialId: "MDBb4eit8rmpn",
     verifyUrl: "https://learn.mongodb.com/c/e5KXrorpRtWzhoLZQh00pQ",
-    skills: ["MongoDB Schema", "Lifecycle Mgmt", "Data Modeling", "NoSQL Database"],
+    skills: ["MongoDB Schema", "Lifecycle Management", "Data Modeling", "NoSQL Database"],
     accent: "emerald",
     suit: "✦",
     image: mongodbCert
@@ -41,6 +43,28 @@ const initialCertifications: Certification[] = [
     accent: "emerald",
     suit: "✦",
     image: vectorSearchCert
+  },
+  {
+    title: "SQL Associate Certificate",
+    issuer: "DataCamp, Inc.",
+    date: "July 2026",
+    credentialId: "SQA0013988104032",
+    verifyUrl: "https://www.datacamp.com/certificate/SQA0013988104032",
+    skills: ["SQL Query", "Database Management"],
+    accent: "cyan",
+    suit: "✦",
+    image: SQLassociate
+  },
+  {
+    title: "Elastic Google Cloud Infrastructure: Scaling and Automation",
+    issuer: "DataCamp, Inc.",
+    date: "July 2026",
+    credentialId: "2c07ca923a2a147543fb2ffea0fa46e9c89d79b3",
+    verifyUrl: "https://www.datacamp.com/completed/statement-of-accomplishment/course/2c07ca923a2a147543fb2ffea0fa46e9c89d79b3?utm_medium=organic_social&utm_campaign=sharewidget&utm_content=soa",
+    skills: ["Cloud Management", "Google Cloud Platform", "Scaling and Automation"],
+    accent: "cyan",
+    suit: "✦",
+    image: GoogleCloud
   },
 ];
 
