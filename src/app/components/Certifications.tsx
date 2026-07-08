@@ -3,11 +3,13 @@ import { motion, useMotionValue, useTransform, AnimatePresence } from "motion/re
 import { Calendar, ExternalLink, FileCheck, RotateCcw, ArrowLeft, ArrowRight, Award, Maximize2, X } from "lucide-react";
 import { SectionReveal, RevealItem } from "./SectionReveal";
 
-// Import certificate images
-import mongodbCert from "../assets/certifications/leonard-tariman-7b9297ae-8ae9-46d5-b386-82d9421d34a5-certificate_page-0001.jpg";
-import vectorSearchCert from "../assets/certifications/leonard-tariman-c108ecf8-269c-4844-9110-a0df7efe2e35-certificate_page-0001.jpg";
-import SQLassociate from "../assets/certifications/SQA0013988104032_page-0001.jpg";
-import GoogleCloud from "../assets/certifications/certificate1_page-0001.jpg";
+// Resolve certificate images through URLs so renamed assets stay type-safe.
+const mongodbSchemaCert = new URL("../assets/certifications/mongodb-schema-lifecycle-management.jpg", import.meta.url).href;
+const mongodbVectorSearchCert = new URL("../assets/certifications/mongodb-atlas-vector-search-for-rag-applications.jpg", import.meta.url).href;
+const sqlAssociateCert = new URL("../assets/certifications/sql-associate-certificate.jpg", import.meta.url).href;
+const aiDevelopersCert = new URL("../assets/certifications/ai-engineer-for-developers-associate.jpg", import.meta.url).href;
+const aiDataScientistsCert = new URL("../assets/certifications/ai-engineer-for-data-scientists-associate.jpg", import.meta.url).href;
+const googleCloudInfraCert = new URL("../assets/certifications/elastic-google-cloud-infrastructure-scaling-and-automation.jpg", import.meta.url).href;
 
 interface Certification {
   title: string;
@@ -31,7 +33,7 @@ const initialCertifications: Certification[] = [
     skills: ["MongoDB Schema", "Lifecycle Management", "Data Modeling", "NoSQL Database"],
     accent: "emerald",
     suit: "✦",
-    image: mongodbCert
+    image: mongodbSchemaCert
   },
   {
     title: "Using Atlas Vector Search for RAG Applications",
@@ -42,7 +44,29 @@ const initialCertifications: Certification[] = [
     skills: ["System Admin", "MongoDB Atlas", "Vector Search", "MongoDB Schema"],
     accent: "emerald",
     suit: "✦",
-    image: vectorSearchCert
+    image: mongodbVectorSearchCert
+  },
+  {
+    title: "AI Engineer for Developers Associate",
+    issuer: "DataCamp, Inc.",
+    date: "July 2026",
+    credentialId: "AIEDA0010711413465",
+    verifyUrl: "https://www.datacamp.com/certificate/AIEDA0010711413465",
+    skills: ["AI Engineerinng", "Software Development"],
+    accent: "cyan",
+    suit: "✦",
+    image: aiDevelopersCert
+  },
+  {
+    title: "AI Engineer for Data Scientists Associate",
+    issuer: "DataCamp, Inc.",
+    date: "July 2026",
+    credentialId: "AEDS0017523298949",
+    verifyUrl: "https://www.datacamp.com/certificate/AEDS0017523298949",
+    skills: ["AI Engineering", "Data Analyst"],
+    accent: "cyan",
+    suit: "✦",
+    image: aiDataScientistsCert
   },
   {
     title: "SQL Associate Certificate",
@@ -53,7 +77,7 @@ const initialCertifications: Certification[] = [
     skills: ["SQL Query", "Database Management"],
     accent: "cyan",
     suit: "✦",
-    image: SQLassociate
+    image: sqlAssociateCert
   },
   {
     title: "Elastic Google Cloud Infrastructure: Scaling and Automation",
@@ -64,7 +88,7 @@ const initialCertifications: Certification[] = [
     skills: ["Cloud Management", "Google Cloud Platform", "Scaling and Automation"],
     accent: "cyan",
     suit: "✦",
-    image: GoogleCloud
+    image: googleCloudInfraCert
   },
 ];
 
