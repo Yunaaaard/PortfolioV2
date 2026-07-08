@@ -1,12 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, useMotionValue, useTransform, AnimatePresence } from "motion/react";
-import { Calendar, ExternalLink, FileCheck, RotateCcw, ArrowLeft, ArrowRight, Award } from "lucide-react";
+import { Calendar, ExternalLink, FileCheck, RotateCcw, ArrowLeft, ArrowRight, Award, Maximize2, X } from "lucide-react";
 import { SectionReveal, RevealItem } from "./SectionReveal";
 
 // Import certificate images
 import mongodbCert from "../assets/certifications/leonard-tariman-7b9297ae-8ae9-46d5-b386-82d9421d34a5-certificate_page-0001.jpg";
 import vectorSearchCert from "../assets/certifications/leonard-tariman-c108ecf8-269c-4844-9110-a0df7efe2e35-certificate_page-0001.jpg";
-import SQLassociate from "../assets/certifications/SQL Associate - Twitter - Post.png";
+import SQLassociate from "../assets/certifications/SQA0013988104032_page-0001.jpg";
 import GoogleCloud from "../assets/certifications/certificate1_page-0001.jpg";
 
 interface Certification {
@@ -239,6 +239,7 @@ function PlayingCard({
 export function Certifications() {
   const [deck, setDeck] = useState<Certification[]>(initialCertifications);
   const [swipedCount, setSwipedCount] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   const handleSwipe = (direction: "left" | "right") => {
     setDeck((prev) => prev.slice(1));
@@ -258,6 +259,29 @@ export function Certifications() {
 
   // The active/top certificate is the first item in the deck
   const activeCert = deck[0];
+
+  // Close lightbox with Escape, and lock page scroll while it's open
+  useEffect(() => {
+    if (!isLightboxOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsLightboxOpen(false);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isLightboxOpen]);
+
+  // If the deck changes (swipe/reset) while the lightbox happens to be open, keep things sane
+  useEffect(() => {
+    if (!activeCert) setIsLightboxOpen(false);
+  }, [activeCert]);
 
   return (
     <section id="certifications" className="py-28 relative overflow-hidden">
@@ -372,20 +396,32 @@ export function Certifications() {
                 {/* Certificate Slide Transition */}
                 <AnimatePresence mode="wait">
                   {activeCert ? (
-                    <motion.div
+                    <motion.button
                       key={activeCert.title}
+                      type="button"
+                      onClick={() => setIsLightboxOpen(true)}
                       initial={{ opacity: 0, x: 20, scale: 0.98 }}
                       animate={{ opacity: 1, x: 0, scale: 1 }}
                       exit={{ opacity: 0, x: -20, scale: 0.98 }}
                       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                      className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center"
+                      whileHover={{ scale: 1.015 }}
+                      className="group/preview relative w-full h-full rounded-2xl overflow-hidden shadow-2xl flex items-center justify-center cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70"
+                      aria-label={`Open full-size view of ${activeCert.title} certificate`}
                     >
                       <img
                         src={activeCert.image}
                         alt={`${activeCert.title} Certificate`}
                         className="w-full h-full object-cover rounded-2xl select-none"
                       />
-                    </motion.div>
+
+                      {/* Hover/press affordance */}
+                      <div className="absolute inset-0 bg-black/0 group-hover/preview:bg-black/40 transition-colors duration-300 flex items-center justify-center">
+                        <div className="opacity-0 group-hover/preview:opacity-100 scale-90 group-hover/preview:scale-100 transition-all duration-300 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/70 border border-white/10 backdrop-blur-sm">
+                          <Maximize2 className="w-3.5 h-3.5 text-white" />
+                          <span className="text-[11px] font-semibold text-white">View full size</span>
+                        </div>
+                      </div>
+                    </motion.button>
                   ) : (
                     // Default / empty deck image placeholder
                     <motion.div
@@ -406,6 +442,53 @@ export function Certifications() {
           </div>
         </SectionReveal>
       </div>
+
+      {/* Fullscreen Lightbox */}
+      <AnimatePresence>
+        {isLightboxOpen && activeCert && (
+          <motion.div
+            key="lightbox-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8 bg-black/85 backdrop-blur-md"
+            onClick={() => setIsLightboxOpen(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${activeCert.title} certificate, full size`}
+          >
+            <button
+              type="button"
+              onClick={() => setIsLightboxOpen(false)}
+              className="absolute top-5 right-5 sm:top-8 sm:right-8 w-10 h-10 rounded-full border border-white/15 bg-white/5 hover:bg-white/10 flex items-center justify-center text-zinc-300 hover:text-white transition-colors z-10"
+              aria-label="Close full-size view"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <motion.div
+              key={`lightbox-image-${activeCert.title}`}
+              initial={{ opacity: 0, scale: 0.92, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 8 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative max-w-5xl w-full max-h-[85vh] flex flex-col items-center gap-4"
+            >
+              <img
+                src={activeCert.image}
+                alt={`${activeCert.title} Certificate, full size`}
+                className="w-auto h-auto max-w-full max-h-[75vh] object-contain rounded-2xl shadow-2xl border border-white/10"
+              />
+              <div className="text-center">
+                <p className="text-sm font-bold text-white">{activeCert.title}</p>
+                <p className="text-xs text-zinc-400">{activeCert.issuer} &middot; {activeCert.date}</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

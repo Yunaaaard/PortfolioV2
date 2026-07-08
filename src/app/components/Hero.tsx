@@ -438,20 +438,6 @@ export function Hero() {
                       ];
                     }).flat()}
                   </div>
-
-                  {/* Card Bottom Footer */}
-                  <div className="flex justify-between items-center text-[10px] text-zinc-500 font-normal mt-3 pl-[24px] pr-1">
-                    <div className="flex items-center gap-1 select-none flex-shrink-0">
-                      <span>Less</span>
-                      <div className="w-[10px] h-[10px] rounded-[2px] bg-[#161b22]" />
-                      <div className="w-[10px] h-[10px] rounded-[2px] bg-[#0e4429]" />
-                      <div className="w-[10px] h-[10px] rounded-[2px] bg-[#006d32]" />
-                      <div className="w-[10px] h-[10px] rounded-[2px] bg-[#26a641]" />
-                      <div className="w-[10px] h-[10px] rounded-[2px] bg-[#39d353]" />
-                      <span>More</span>
-                    </div>
-                  </div>
-
                 </div>
               </div>
 
