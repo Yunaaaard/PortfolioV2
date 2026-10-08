@@ -41,7 +41,6 @@ export function Contact() {
 
   const contactInfo = [
     { icon: Mail, label: "Email", value: "tarimanleonard28@gmail.com", href: "mailto:tarimanleonard28@gmail.com" },
-    { icon: Phone, label: "Phone", value: "+9658247857", href: "tel:09658247857" },
     { icon: MapPin, label: "Location", value: "Cebu City, Cebu", href: null },
   ];
 
