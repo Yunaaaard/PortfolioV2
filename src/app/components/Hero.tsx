@@ -197,7 +197,7 @@ export function Hero() {
       className="min-h-screen flex flex-col justify-center relative pt-32 pb-20"
     >
       <motion.div
-        style={{ y: heroY, opacity: heroOpacity }}
+        style={{ y: heroY, opacity: heroOpacity, willChange: "transform, opacity" }}
         className="container mx-auto px-6 z-10 max-w-5xl"
       >
         <SectionReveal direction="up" stagger={0.1}>

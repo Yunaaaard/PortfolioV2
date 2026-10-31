@@ -22,8 +22,8 @@ export default function App() {
     <div className="min-h-screen overflow-x-hidden bg-[#09090b] text-zinc-100 relative selection:bg-white/15 selection:text-white">
       {/* Precision Top Scroll Indicator */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-[1.5px] bg-zinc-200 z-50 origin-left"
-        style={{ scaleX }}
+        className="fixed top-0 left-0 right-0 h-[1.5px] bg-zinc-200 z-50 origin-left pointer-events-none"
+        style={{ scaleX, willChange: "transform" }}
       />
 
       {/* Modern Ambient Architectural Background */}

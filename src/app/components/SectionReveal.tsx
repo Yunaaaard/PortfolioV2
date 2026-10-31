@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform, useSpring, type Variant } from "motion/react";
+import { motion, useScroll, useSpring, type Variant } from "motion/react";
 import { useRef, type ReactNode } from "react";
 
 type Direction = "up" | "down" | "left" | "right";
@@ -13,63 +13,32 @@ interface SectionRevealProps {
 }
 
 const directionOffsets: Record<Direction, { x: number; y: number }> = {
-  up: { x: 0, y: 28 },
-  down: { x: 0, y: -28 },
-  left: { x: 28, y: 0 },
-  right: { x: -28, y: 0 },
-};
-
-const hiddenVariant = (dir: Direction): Variant => ({
-  opacity: 0,
-  x: directionOffsets[dir].x,
-  y: directionOffsets[dir].y,
-  filter: "blur(8px)",
-});
-
-const visibleVariant: Variant = {
-  opacity: 1,
-  x: 0,
-  y: 0,
-  filter: "blur(0px)",
+  up: { x: 0, y: 22 },
+  down: { x: 0, y: -22 },
+  left: { x: 22, y: 0 },
+  right: { x: -22, y: 0 },
 };
 
 /**
- * Scroll-linked section reveal with continuous depth parallax and staggered blur-to-sharp children.
+ * High-performance, GPU-composited staggered section reveal.
+ * Optimized with cubic-bezier easing and hardware isolation for locked 60fps/120fps scrolling.
  */
 export function SectionReveal({
   children,
   delay = 0,
-  stagger = 0.09,
+  stagger = 0.08,
   className,
-  once = false,
+  once = true,
 }: SectionRevealProps) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start 0.95", "end 0.1"],
-  });
-
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 110,
-    damping: 28,
-    restDelta: 0.001,
-  });
-
-  const y = useTransform(smoothProgress, [0, 0.22, 0.85, 1], [36, 0, 0, -24]);
-  const scale = useTransform(smoothProgress, [0, 0.2, 0.88, 1], [0.975, 1, 1, 0.985]);
-  const opacity = useTransform(smoothProgress, [0, 0.15, 0.9, 1], [0.2, 1, 1, 0.55]);
-
   return (
     <motion.div
-      ref={ref}
-      style={{ y, scale, opacity }}
       initial="hidden"
       whileInView="visible"
       viewport={{ once, amount: 0.12 }}
       variants={{
-        hidden: {},
+        hidden: { opacity: 0 },
         visible: {
+          opacity: 1,
           transition: {
             staggerChildren: stagger,
             delayChildren: delay,
@@ -77,6 +46,7 @@ export function SectionReveal({
         },
       }}
       className={className}
+      style={{ willChange: "opacity" }}
     >
       {children}
     </motion.div>
@@ -84,7 +54,7 @@ export function SectionReveal({
 }
 
 /**
- * Animated child item that transitions from blurred + offset to razor-sharp on scroll.
+ * Animated child item that glides into position using silky ease-out deceleration.
  */
 export function RevealItem({
   children,
@@ -95,18 +65,27 @@ export function RevealItem({
   direction?: Direction;
   className?: string;
 }) {
+  const offset = directionOffsets[direction];
+
   return (
     <motion.div
       variants={{
-        hidden: hiddenVariant(direction),
+        hidden: {
+          opacity: 0,
+          x: offset.x,
+          y: offset.y,
+        },
         visible: {
-          ...visibleVariant,
+          opacity: 1,
+          x: 0,
+          y: 0,
           transition: {
-            duration: 0.7,
-            ease: [0.22, 1, 0.36, 1],
+            duration: 0.65,
+            ease: [0.16, 1, 0.3, 1],
           },
         },
       }}
+      style={{ willChange: "transform, opacity" }}
       className={className}
     >
       {children}
@@ -133,11 +112,12 @@ export function EditorialSectionHeader({
   const headerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: headerRef,
-    offset: ["start 0.92", "start 0.45"],
+    offset: ["start 0.95", "start 0.55"],
   });
   const lineScale = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 30,
+    stiffness: 100,
+    damping: 26,
+    restDelta: 0.001,
   });
 
   return (
@@ -149,7 +129,7 @@ export function EditorialSectionHeader({
         </span>
         <div className="relative flex-1 h-px bg-white/[0.06] overflow-hidden">
           <motion.div
-            style={{ scaleX: lineScale }}
+            style={{ scaleX: lineScale, willChange: "transform" }}
             className="absolute inset-0 bg-white/30 origin-left"
           />
         </div>

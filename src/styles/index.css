@@ -6,7 +6,9 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
   color-scheme: dark;
+  overscroll-behavior-y: none;
 }
 
 body {
@@ -16,6 +18,13 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* GPU hardware isolation for buttery smooth section scrolling */
+section {
+  contain: layout style;
+  will-change: auto;
 }
 
 ::selection {
@@ -66,14 +75,16 @@ body {
   font-size: 0.8125rem;
   padding: 0.625rem 1.25rem;
   border-radius: 9999px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .pro-btn-primary:hover,
 .neon-btn:hover {
   background-color: #e4e4e7;
-  transform: translateY(-1px);
+  transform: translateY(-1.5px);
 }
 
 .pro-btn-primary:active,
@@ -94,16 +105,18 @@ body {
   padding: 0.625rem 1.25rem;
   border-radius: 9999px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .pro-btn-secondary:hover,
 .neon-btn-outline:hover {
   background-color: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.24);
   color: #ffffff;
-  transform: translateY(-1px);
+  transform: translateY(-1.5px);
 }
 
 .pro-btn-secondary:active,
@@ -117,12 +130,14 @@ body {
   background: #0d0d10;
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 0.875rem;
-  transition: border-color 0.25s ease, background-color 0.25s ease;
+  transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .pro-card:hover,
 .neon-card:hover {
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.16);
 }
 
 /* Minimal scrollbar */

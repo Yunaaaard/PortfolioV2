@@ -120,6 +120,7 @@ export function About() {
                           stiffness: 260,
                           damping: 24,
                         }}
+                        style={{ willChange: "transform, opacity" }}
                         onClick={() => {
                           if (isFront) {
                             nextPhoto();
@@ -132,6 +133,7 @@ export function About() {
                         <img
                           src={photo.src}
                           alt={photo.alt}
+                          decoding="async"
                           className="w-full h-full object-cover"
                         />
 

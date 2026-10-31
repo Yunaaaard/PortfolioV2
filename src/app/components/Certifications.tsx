@@ -132,7 +132,7 @@ function CertificatePreviewCard({
         ref={cardRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+        style={{ rotateX, rotateY, transformStyle: "preserve-3d", willChange: "transform" }}
         className="pro-card p-5 sm:p-6"
       >
         {/* Document Image */}
