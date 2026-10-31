@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
 import { ArrowDown, ArrowUpRight, Github, Linkedin, Mail, Facebook, Instagram } from "lucide-react";
 import { SectionReveal, RevealItem } from "./SectionReveal";
+import { RubiksCube } from "./RubiksCube";
 
 interface ContributionDay {
   date: string;
@@ -201,23 +202,32 @@ export function Hero() {
         className="container mx-auto px-6 z-10 max-w-5xl"
       >
         <SectionReveal direction="up" stagger={0.1}>
-          {/* Main Editorial Heading */}
-          <RevealItem>
-            <h1 className="text-4xl sm:text-6xl md:text-[68px] font-semibold tracking-tight text-zinc-100 mb-6 max-w-4xl leading-[1.06]">
-              Software developer building{" "}
-              <span className="font-serif-editorial italic font-normal text-zinc-300">
-                dependable
-              </span>{" "}
-              web &amp; mobile applications.
-            </h1>
-          </RevealItem>
+          {/* Main Editorial Heading & 3D Rubik's Companion */}
+          <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center mb-6">
+            <div className="lg:col-span-8">
+              <RevealItem>
+                <h1 className="text-4xl sm:text-6xl md:text-[64px] font-semibold tracking-tight text-zinc-100 mb-6 leading-[1.06]">
+                  Software developer building{" "}
+                  <span className="font-serif-editorial italic font-normal text-zinc-300">
+                    dependable
+                  </span>{" "}
+                  web &amp; mobile applications.
+                </h1>
+              </RevealItem>
 
-          {/* Direct, Grounded Summary */}
-          <RevealItem>
-            <p className="text-base sm:text-lg text-zinc-400 max-w-2xl mb-10 leading-relaxed font-normal">
-              I&apos;m <span className="text-zinc-100 font-medium">Leonard Tariman</span>, an Information Technology graduate working with React, TypeScript, Flutter, and .NET to build clean interfaces and practical software.
-            </p>
-          </RevealItem>
+              <RevealItem>
+                <p className="text-base sm:text-lg text-zinc-400 max-w-2xl leading-relaxed font-normal">
+                  I&apos;m <span className="text-zinc-100 font-medium">Leonard Tariman</span>, an Information Technology graduate working with React, TypeScript, Flutter, and .NET to build clean interfaces and practical software.
+                </p>
+              </RevealItem>
+            </div>
+
+            <div className="lg:col-span-4 flex justify-center lg:justify-end">
+              <RevealItem direction="right">
+                <RubiksCube />
+              </RevealItem>
+            </div>
+          </div>
 
           {/* Actions & Socials */}
           <RevealItem>
