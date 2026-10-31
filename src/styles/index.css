@@ -2,8 +2,6 @@
 @import './tailwind.css';
 @import './theme.css';
 
-/* ===== SWISS EDITORIAL & MINIMALIST ARCHITECTURE ===== */
-
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
@@ -21,7 +19,6 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* GPU hardware isolation for buttery smooth section scrolling */
 section {
   contain: layout style;
   will-change: auto;
