@@ -1,291 +1,326 @@
-import { Github, Lock } from "lucide-react";
-import { useEffect, useRef } from "react";
-import type { PointerEvent as ReactPointerEvent } from "react";
+import { useState, useRef } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { Github, Lock, ArrowUpRight, X } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
-import { SectionReveal, RevealItem } from "./SectionReveal";
+import { SectionReveal, RevealItem, EditorialSectionHeader } from "./SectionReveal";
 
-// Import project images
 import ecofarmImg from "../assets/images/ecofarm.png";
 import scholarlyImg from "../assets/images/scholarly.png";
 import cofinoyImg from "../assets/images/cofinoy.png";
 import cartImg from "../assets/images/cart.png";
 import pacmanImg from "../assets/images/pacman.png";
 
-export function Projects() {
-  const trackRef = useRef<HTMLDivElement | null>(null);
-  const animationRef = useRef<number | null>(null);
-  const isHoveringRef = useRef(false);
-  const isDraggingRef = useRef(false);
-  const hasDraggedRef = useRef(false); // suppresses click after drag
-  const dragStartXRef = useRef(0);
-  const scrollStartXRef = useRef(0);
+interface Project {
+  id: string;
+  index: string;
+  title: string;
+  year: string;
+  summary: string;
+  description: string;
+  image: string;
+  tags: string[];
+  github: string;
+  isPrivate: boolean;
+}
 
-  const projects = [
-    {
-      title: "EcoFarmAI",
-      description: "A sustainable AI-powered land suitability assessment tool.",
-      image: ecofarmImg,
-      tags: ["React TS", "PostgreSQL", "TensorFlow", "CNN"],
-      github: "https://github.com",
-      accent: "violet",
-      isPrivate: true,
-    },
-    {
-      title: "SCHOLARLY",
-      description: "A website for applying scholarships powered by Laravel and Bootstrap Framework.",
-      image: scholarlyImg,
-      tags: ["Laravel", "PHP", "Bootstrap", "MySQL"],
-      github: "https://github.com",
-      accent: "fuchsia",
-      isPrivate: true,
-    },
-    {
-      title: "COFINOY",
-      description: "A Coffee Ordering System Showcasing Filipino Flavors and Traditions",
-      image: cofinoyImg,
-      tags: ["React", "Firebase", "C#", ".NET"],
-      github: "https://github.com",
-      accent: "cyan",
-      isPrivate: true,
-    },
-    {
-      title: "SCart",
-      description: "A smart cart shopping app with budget adherence and insightful analytics.",
-      image: cartImg,
-      tags: ["Dart", "SQLite"],
-      github: "https://github.com/Yunaaaard/SmartCart",
-      accent: "violet",
-      isPrivate: false,
-    },
-    {
-      title: "PACMAN",
-      description: "A simple PACMAN game with Machine Learning using Java - Object Oriented Programming",
-      image: pacmanImg,
-      tags: ["Java", "Machine Learning", "OOP"],
-      github: "https://github.com/Yunaaaard/Pac-man",
-      accent: "cyan",
-      isPrivate: false,
-    },
-  ];
+const projects: Project[] = [
+  {
+    id: "ecofarm",
+    index: "01",
+    title: "EcoFarmAI",
+    year: "2025",
+    summary: "AI-assisted land suitability assessment tool.",
+    description:
+      "A web application that evaluates soil and environmental inputs to help assess crop suitability, built with React, TypeScript, PostgreSQL, and a TensorFlow CNN model.",
+    image: ecofarmImg,
+    tags: ["React", "TypeScript", "PostgreSQL", "TensorFlow", "CNN"],
+    github: "https://github.com",
+    isPrivate: true,
+  },
+  {
+    id: "scholarly",
+    index: "02",
+    title: "Scholarly",
+    year: "2024",
+    summary: "Scholarship application and review portal.",
+    description:
+      "A web platform built with Laravel, PHP, Bootstrap, and MySQL for submitting scholarship applications, managing applicant documents, and tracking review status.",
+    image: scholarlyImg,
+    tags: ["Laravel", "PHP", "Bootstrap", "MySQL"],
+    github: "https://github.com",
+    isPrivate: true,
+  },
+  {
+    id: "cofinoy",
+    index: "03",
+    title: "Cofinoy",
+    year: "2024",
+    summary: "Coffee ordering system showcasing local Filipino blends.",
+    description:
+      "An ordering and catalog management system built with React, Firebase, C#, and .NET, designed around regional Filipino coffee varieties.",
+    image: cofinoyImg,
+    tags: ["React", "Firebase", "C#", ".NET"],
+    github: "https://github.com",
+    isPrivate: true,
+  },
+  {
+    id: "scart",
+    index: "04",
+    title: "SCart",
+    year: "2024",
+    summary: "Mobile shopping cart companion with budget tracking.",
+    description:
+      "A mobile app written in Dart and Flutter using local SQLite storage to track shopping items against a set budget and view spending breakdowns.",
+    image: cartImg,
+    tags: ["Flutter", "Dart", "SQLite"],
+    github: "https://github.com/Yunaaaard/SmartCart",
+    isPrivate: false,
+  },
+  {
+    id: "pacman",
+    index: "05",
+    title: "Pac-Man ML",
+    year: "2023",
+    summary: "Java OOP Pac-Man recreation with autonomous ghost behavior.",
+    description:
+      "A desktop Pac-Man game built in Java demonstrating object-oriented design patterns and pathfinding heuristics for ghost movement.",
+    image: pacmanImg,
+    tags: ["Java", "Machine Learning", "OOP"],
+    github: "https://github.com/Yunaaaard/Pac-man",
+    isPrivate: false,
+  },
+];
 
-  const tagBg: Record<string, string> = {
-    violet: "bg-violet-500/10 text-violet-300 border border-violet-500/20",
-    fuchsia: "bg-fuchsia-500/10 text-fuchsia-300 border border-fuchsia-500/20",
-    cyan: "bg-cyan-500/10 text-cyan-300 border border-cyan-500/20",
-  };
+function ProjectCard({
+  project,
+  onSelect,
+  featured = false,
+}: {
+  project: Project;
+  onSelect: (p: Project) => void;
+  featured?: boolean;
+}) {
+  const cardRef = useRef<HTMLDivElement>(null);
 
-  const borderGlow: Record<string, string> = {
-    violet: "hover:border-violet-500/40 hover:shadow-[0_0_30px_rgba(139,92,246,0.15)]",
-    fuchsia: "hover:border-fuchsia-500/40 hover:shadow-[0_0_30px_rgba(217,70,239,0.15)]",
-    cyan: "hover:border-cyan-500/40 hover:shadow-[0_0_30px_rgba(6,182,212,0.15)]",
-  };
-
-  // Triple-clone so seamless looping works even when dragging backward
-  const loopingProjects = [...projects, ...projects, ...projects];
-
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-
-    const speed = 0.5;
-    let started = false;
-
-    const startLoop = () => {
-      const oneSetWidth = track.scrollWidth / 3;
-
-      // Only start once scrollWidth is actually painted (non-zero)
-      if (oneSetWidth === 0) {
-        animationRef.current = window.requestAnimationFrame(startLoop);
-        return;
-      }
-
-      if (!started) {
-        // Jump to the middle clone set on first valid frame
-        track.scrollLeft = oneSetWidth;
-        started = true;
-      }
-
-      const animate = () => {
-        const w = track.scrollWidth / 3;
-
-        if (!isHoveringRef.current && !isDraggingRef.current) {
-          track.scrollLeft += speed;
-
-          if (track.scrollLeft >= w * 2) {
-            track.scrollLeft -= w;
-          }
-          if (track.scrollLeft < w) {
-            track.scrollLeft += w;
-          }
-        }
-
-        animationRef.current = window.requestAnimationFrame(animate);
-      };
-
-      animationRef.current = window.requestAnimationFrame(animate);
-    };
-
-    animationRef.current = window.requestAnimationFrame(startLoop);
-
-    return () => {
-      if (animationRef.current !== null) {
-        window.cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, []);
-
-  const handlePointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLElement;
-    // Don't drag-scroll if the user clicked a link or button
-    if (target.closest("a") || target.closest("button")) {
-      return;
-    }
-
-    const track = trackRef.current;
-    if (!track) return;
-
-    isDraggingRef.current = true;
-    hasDraggedRef.current = false;
-    dragStartXRef.current = e.clientX;
-    scrollStartXRef.current = track.scrollLeft;
-    track.setPointerCapture(e.pointerId);
-  };
-
-  const handlePointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
-    const track = trackRef.current;
-    if (!track || !isDraggingRef.current) return;
-
-    const deltaX = e.clientX - dragStartXRef.current;
-
-    // Only flag as "dragged" after a few pixels of movement
-    if (Math.abs(deltaX) > 10) {
-      hasDraggedRef.current = true;
-    }
-
-    const oneSetWidth = track.scrollWidth / 3;
-    let next = scrollStartXRef.current - deltaX;
-
-    // Clamp within the middle set boundaries so looping stays seamless
-    if (next < oneSetWidth) next += oneSetWidth;
-    if (next >= oneSetWidth * 2) next -= oneSetWidth;
-
-    track.scrollLeft = next;
-  };
-
-  const endDragging = () => {
-    isDraggingRef.current = false;
-  };
-
-  const handleClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-  ) => {
-    // Suppress link navigation if the user was dragging
-    if (hasDraggedRef.current) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    cardRef.current.style.setProperty("--mx", `${e.clientX - rect.left}px`);
+    cardRef.current.style.setProperty("--my", `${e.clientY - rect.top}px`);
   };
 
   return (
-    <section id="projects" className="py-24 relative">
-      <div className="container mx-auto px-6 relative">
-        <SectionReveal direction="up" stagger={0.1}>
-          <RevealItem>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 text-center">
-              Featured{" "}
-              <span className="bg-gradient-to-r from-fuchsia-400 to-violet-400 bg-clip-text text-transparent">
-                Projects
+    <motion.div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      whileHover={{ y: -3 }}
+      transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+      onClick={() => onSelect(project)}
+      className={`group relative pro-card overflow-hidden cursor-pointer flex flex-col justify-between ${
+        featured ? "md:col-span-2" : "col-span-1"
+      }`}
+    >
+      {/* Subtle monochrome cursor spotlight */}
+      <div
+        className="pointer-events-none absolute -inset-px opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{
+          background:
+            "radial-gradient(420px circle at var(--mx, 0px) var(--my, 0px), rgba(255,255,255,0.055), transparent 75%)",
+        }}
+      />
+
+      {/* Image Preview */}
+      <div className="relative h-52 sm:h-56 bg-[#08080a] border-b border-white/[0.06] flex items-center justify-center p-6 overflow-hidden">
+        <ImageWithFallback
+          src={project.image}
+          alt={project.title}
+          className="max-w-[85%] max-h-[160px] object-contain group-hover:scale-[1.04] transition-transform duration-500 ease-out"
+        />
+        <span className="absolute top-3.5 left-4 font-mono-jb text-[11px] text-zinc-500">
+          {project.index}
+        </span>
+        <span className="absolute top-3.5 right-4 font-mono-jb text-[11px] text-zinc-500">
+          {project.year}
+        </span>
+      </div>
+
+      {/* Body */}
+      <div className="p-6 flex-1 flex flex-col justify-between relative z-10">
+        <div>
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <h3 className="text-lg font-semibold text-zinc-100 tracking-tight group-hover:text-white transition-colors">
+              {project.title}
+            </h3>
+            <ArrowUpRight className="w-4 h-4 text-zinc-600 group-hover:text-zinc-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+          </div>
+          <p className="text-sm text-zinc-400 leading-relaxed mb-5">
+            {project.summary}
+          </p>
+        </div>
+
+        <div className="pt-4 border-t border-white/[0.06] flex items-center justify-between gap-3">
+          <div className="flex flex-wrap gap-1.5">
+            {project.tags.slice(0, 4).map((tag) => (
+              <span
+                key={tag}
+                className="font-mono-jb text-[11px] text-zinc-400 px-2 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]"
+              >
+                {tag}
               </span>
-            </h2>
-          </RevealItem>
-          <RevealItem>
-            <p className="text-lg text-zinc-400 mb-16 text-center max-w-2xl mx-auto font-mono-jb text-[15px]">
-              Here are some of my recent works that showcase my skills and passion for development.
-            </p>
-          </RevealItem>
+            ))}
+          </div>
 
-          <div className="relative mx-auto max-w-7xl px-6 lg:px-12">
-            {/* Fade edges for a polished infinite feel */}
-            <div className="pointer-events-none absolute left-6 lg:left-12 top-0 h-full w-16 z-10 bg-gradient-to-r from-[#06060f] to-transparent" />
-            <div className="pointer-events-none absolute right-6 lg:right-12 top-0 h-full w-16 z-10 bg-gradient-to-l from-[#06060f] to-transparent" />
-
-            <div
-              ref={trackRef}
-              className="projects-track flex gap-4 md:gap-6 lg:gap-8 overflow-x-auto overflow-y-hidden select-none cursor-grab active:cursor-grabbing"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-              onMouseEnter={() => { isHoveringRef.current = true; }}
-              onMouseLeave={() => { isHoveringRef.current = false; }}
-              onPointerDown={handlePointerDown}
-              onPointerMove={handlePointerMove}
-              onPointerUp={endDragging}
-              onPointerCancel={endDragging}
+          {project.isPrivate ? (
+            <span
+              className="inline-flex items-center gap-1 text-[11px] font-mono-jb text-zinc-500 shrink-0"
+              title="Private repository"
             >
-              {loopingProjects.map((project, index) => (
-                <div
-                  key={`${project.title}-${index}`}
-                  className="w-[85vw] sm:w-[22rem] md:w-[23rem] lg:w-[24rem] shrink-0"
-                >
-                  <div
-                    className={`group h-full bg-[#0d0d1a] border border-white/5 rounded-2xl overflow-hidden transition-all duration-300 ${borderGlow[project.accent]}`}
-                  >
-                    <div className="relative h-48 overflow-hidden bg-black/30 flex items-center justify-center p-6 border-b border-white/5">
-                      <ImageWithFallback
-                        src={project.image}
-                        alt={project.title}
-                        className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300 opacity-80 group-hover:opacity-100"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0d0d1a] to-transparent opacity-20 pointer-events-none" />
-                    </div>
-                    <div className="p-6">
-                      <h3 className="text-xl font-semibold text-white mb-2">{project.title}</h3>
-                      <p className="text-zinc-400 mb-4 text-xs leading-relaxed font-mono-jb">{project.description}</p>
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {project.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className={`px-3 py-1 text-xs rounded-full font-medium ${tagBg[project.accent]}`}
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="flex items-center">
-                        {project.isPrivate ? (
-                          <div className="relative group/code flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-white/5 bg-white/[0.01] text-zinc-400 select-none transition-all duration-300 hover:bg-white/[0.03] hover:border-zinc-800 cursor-default">
-                            <Github className="w-4 h-4" />
-                            <span className="text-sm font-medium">Code</span>
-                            <Lock className="w-3.5 h-3.5 text-zinc-500 group-hover/code:text-amber-400 group-hover/code:scale-110 transition-all duration-300" />
-                            <div className="absolute bottom-full left-0 mb-2.5 w-max scale-95 opacity-0 pointer-events-none group-hover/code:scale-100 group-hover/code:opacity-100 transition-all duration-300 origin-bottom-left z-20">
-                              <div className="bg-[#0f0f1a]/95 border border-white/10 text-zinc-400 text-xs px-3 py-1.5 rounded-lg shadow-xl backdrop-blur-md font-medium tracking-wide">
-                                This repository is private
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                          <a
-                            href={project.github}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={handleClick}
-                            className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl border border-violet-500/30 bg-violet-500/10 text-violet-300 hover:bg-violet-500/20 hover:border-violet-500/50 hover:text-white transition-all duration-300 shadow-[0_0_12px_rgba(139,92,246,0.1)] cursor-pointer"
-                          >
-                            <Github className="w-4 h-4" />
-                            <span className="text-sm font-semibold">Code</span>
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+              <Lock className="w-3 h-3" />
+              <span>Private</span>
+            </span>
+          ) : (
+            <a
+              href={project.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-1 text-xs font-medium text-zinc-300 hover:text-white shrink-0 transition-colors"
+            >
+              <Github className="w-3.5 h-3.5" />
+              <span>Code</span>
+            </a>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
-            <style>{`
-              .projects-track::-webkit-scrollbar { display: none; }
-            `}</style>
+export function Projects() {
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  return (
+    <section id="projects" className="py-28 relative">
+      <div className="container mx-auto px-6 max-w-5xl relative z-10">
+        <SectionReveal direction="up" stagger={0.08}>
+          <RevealItem>
+            <EditorialSectionHeader
+              index="02"
+              label="Selected Work"
+              title="Projects &"
+              serifWord="experiments."
+              subtitle="A selection of academic, personal, and full-stack software builds."
+            />
+          </RevealItem>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {projects.map((project, idx) => (
+              <RevealItem
+                key={project.id}
+                className={idx === 0 ? "md:col-span-2" : "col-span-1"}
+              >
+                <ProjectCard
+                  project={project}
+                  onSelect={setSelectedProject}
+                  featured={idx === 0}
+                />
+              </RevealItem>
+            ))}
           </div>
         </SectionReveal>
       </div>
+
+      {/* Clean Project Detail Modal */}
+      <AnimatePresence>
+        {selectedProject && (
+          <motion.div
+            key="project-detail-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md"
+            onClick={() => setSelectedProject(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 12 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-xl rounded-2xl bg-[#0c0c0f] border border-white/10 p-6 sm:p-8 shadow-2xl"
+            >
+              <button
+                onClick={() => setSelectedProject(null)}
+                className="absolute top-5 right-5 w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              <div className="space-y-5">
+                <div>
+                  <span className="font-mono-jb text-xs text-zinc-500">
+                    {selectedProject.index} &middot; {selectedProject.year}
+                  </span>
+                  <h3 className="text-2xl font-semibold text-zinc-100 mt-1">
+                    {selectedProject.title}
+                  </h3>
+                </div>
+
+                <div className="aspect-video w-full rounded-xl bg-[#08080a] border border-white/[0.06] flex items-center justify-center p-6">
+                  <ImageWithFallback
+                    src={selectedProject.image}
+                    alt={selectedProject.title}
+                    className="max-w-full max-h-full object-contain"
+                  />
+                </div>
+
+                <p className="text-sm text-zinc-300 leading-relaxed">
+                  {selectedProject.description}
+                </p>
+
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedProject.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="font-mono-jb text-xs px-2.5 py-1 rounded bg-white/[0.03] text-zinc-300 border border-white/[0.07]"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="pt-4 border-t border-white/[0.07] flex items-center justify-between">
+                  {selectedProject.isPrivate ? (
+                    <span className="inline-flex items-center gap-1.5 text-xs text-zinc-500 font-mono-jb">
+                      <Lock className="w-3.5 h-3.5" />
+                      <span>Private repository</span>
+                    </span>
+                  ) : (
+                    <a
+                      href={selectedProject.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="pro-btn-primary !text-xs !py-2 !px-4"
+                    >
+                      <Github className="w-3.5 h-3.5" />
+                      <span>View on GitHub</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+
+                  <button
+                    onClick={() => setSelectedProject(null)}
+                    className="pro-btn-secondary !text-xs !py-2 !px-4"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

@@ -1,3 +1,4 @@
+import { Navbar } from "./components/Navbar";
 import { Hero } from "./components/Hero";
 import { About } from "./components/About";
 import { Projects } from "./components/Projects";
@@ -14,32 +15,37 @@ export default function App() {
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,
-    restDelta: 0.001
+    restDelta: 0.001,
   });
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#050510] text-white relative">
-      {/* Top glowing scroll progress bar */}
+    <div className="min-h-screen overflow-x-hidden bg-[#09090b] text-zinc-100 relative selection:bg-white/15 selection:text-white">
+      {/* Precision Top Scroll Indicator */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-cyan-400 z-50 origin-left shadow-[0_0_12px_rgba(139,92,246,0.6)]"
+        className="fixed top-0 left-0 right-0 h-[1.5px] bg-zinc-200 z-50 origin-left"
         style={{ scaleX }}
       />
 
-      {/* Cosmic Background — stars, nebulae, shooting stars */}
+      {/* Modern Ambient Architectural Background */}
       <CosmicBackground />
 
+      {/* Floating Header Navigation */}
+      <Navbar />
+
       {/* Main Content Sections */}
-      <div className="relative z-10">
+      <main className="relative z-10">
         <Hero />
         <About />
         <Projects />
         <Certifications />
         <Skills />
         <Contact />
-        <Footer />
-      </div>
+      </main>
 
-      {/* Floating Chat Assistant */}
+      {/* Footer */}
+      <Footer />
+
+      {/* Portfolio Assistant */}
       <Chatbot />
     </div>
   );

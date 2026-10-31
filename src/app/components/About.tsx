@@ -1,182 +1,224 @@
-import { useState, useEffect, useRef } from "react";
-import { GraduationCap, Sparkles, Code, User } from "lucide-react";
-import { SectionReveal, RevealItem } from "./SectionReveal";
-import profileImg from "../assets/images/GRAD-PIC.png";
+import { useState } from "react";
+import { ArrowLeft, ArrowRight, Maximize2, X } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { SectionReveal, RevealItem, EditorialSectionHeader } from "./SectionReveal";
 
-function TypewriterText({
-  text,
-  className,
-  speed = 18,
-  startDelay = 200,
-}: {
-  text: string;
-  className?: string;
-  speed?: number;
-  startDelay?: number;
-}) {
-  const [displayed, setDisplayed] = useState("");
-  const [started, setStarted] = useState(false);
-  const ref = useRef<HTMLParagraphElement>(null);
+import gradImg from "../assets/images/GRAD-PIC.png";
+import pogiImg from "../assets/images/yunard-pogi.jpg";
+import chuyImg from "../assets/images/yunard-chuy.jpg";
 
-  // Observe visibility using IntersectionObserver
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !started) {
-          setStarted(true);
-        }
-      },
-      { threshold: 0.3 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [started]);
-
-  // Type characters one by one
-  useEffect(() => {
-    if (!started) return;
-
-    const timeout = setTimeout(() => {
-      let i = 0;
-      const interval = setInterval(() => {
-        i++;
-        setDisplayed(text.slice(0, i));
-        if (i >= text.length) clearInterval(interval);
-      }, speed);
-      return () => clearInterval(interval);
-    }, startDelay);
-
-    return () => clearTimeout(timeout);
-  }, [started, text, speed, startDelay]);
-
-  return (
-    <div ref={ref} className={`relative ${className ?? ""}`}>
-      {/* Invisible full text to reserve final layout height */}
-      <span className="invisible" aria-hidden="true">{text}</span>
-      {/* Visible typewriter overlay */}
-      <span className="absolute inset-0">
-        {displayed}
-        {displayed.length < text.length && (
-          <span className="inline-block w-[2px] h-[1em] bg-violet-400 ml-[1px] align-middle animate-pulse" />
-        )}
-      </span>
-    </div>
-  );
+interface PhotoItem {
+  id: string;
+  src: string;
+  alt: string;
+  note: string;
 }
 
+const photos: PhotoItem[] = [
+  {
+    id: "portrait-1",
+    src: pogiImg,
+    alt: "Leonard Tariman",
+    note: "Cebu City, PH",
+  },
+  {
+    id: "portrait-2",
+    src: chuyImg,
+    alt: "Leonard Tariman portrait",
+    note: "Off-desk",
+  },
+  {
+    id: "grad",
+    src: gradImg,
+    alt: "Leonard Tariman graduation",
+    note: "BS Information Technology",
+  },
+];
+
 export function About() {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
-  const infoItems = [
-    {
-      icon: GraduationCap,
-      label: "Education",
-      value: "BS Information Technology",
-      color: "text-cyan-400"
-    },
-    {
-      icon: Code,
-      label: "Focus",
-      value: "Software Development",
-      color: "text-violet-400"
-    },
-    {
-      icon: Sparkles,
-      label: "Interests",
-      value: "Thriving Technologies",
-      color: "text-fuchsia-400"
-    }
+  const nextPhoto = () => setActiveIndex((prev) => (prev + 1) % photos.length);
+  const prevPhoto = () => setActiveIndex((prev) => (prev - 1 + photos.length) % photos.length);
+
+  const activePhoto = photos[activeIndex];
+
+  const details = [
+    { label: "Degree", value: "BS Information Technology" },
+    { label: "Base", value: "Cebu City, Philippines" },
+    { label: "Primary Stack", value: "React, TypeScript, Flutter, .NET" },
+    { label: "Availability", value: "Open for freelance projects" },
   ];
-
-  const bio1 = "Motivated and results-driven Information Technology graduate seeking a challenging position as a Software Developer. Offering a strong foundation in software engineering, systems design, and full-stack development, with a proven ability to build scalable solutions.";
-  const bio2 = "I enjoy solving complex technical problems, designing beautiful user interfaces, and learning new languages and architectures. My goal is to build software that is both elegant on the inside and impactful to users.";
 
   return (
     <section id="about" className="py-28 relative">
-      <div className="container mx-auto px-6 relative">
-        <SectionReveal direction="up" stagger={0.15} className="max-w-5xl mx-auto">
+      <div className="container mx-auto px-6 max-w-5xl relative z-10">
+        <SectionReveal direction="up" stagger={0.1}>
           <RevealItem>
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-16 text-center">
-              About{" "}
-              <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
-                Me
-              </span>
-            </h2>
+            <EditorialSectionHeader
+              index="01"
+              label="Background"
+              title="About"
+              serifWord="me."
+            />
           </RevealItem>
 
-          <div className="grid md:grid-cols-12 gap-12 items-center">
-            {/* Left: Photo Frame Container */}
-            <div className="md:col-span-5 flex justify-center">
-              <RevealItem direction="left">
+          <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+            {/* Left: Interactive Fanned Photo Stack */}
+            <div className="lg:col-span-5 flex flex-col items-center lg:items-start">
+              <RevealItem direction="left" className="w-full max-w-[340px]">
                 <div
-                  className="relative group w-full max-w-[340px]"
+                  className="relative aspect-[3/3.8] w-full select-none"
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
                 >
-                  {/* Cosmic glow layer behind frame */}
-                  <div className="absolute -inset-1.5 rounded-3xl bg-gradient-to-tr from-violet-500 via-fuchsia-500 to-cyan-400 opacity-20 blur-lg group-hover:opacity-35 transition duration-500" />
+                  {photos.map((photo, index) => {
+                    // Relative position in stack: 0 = front, 1 = middle, 2 = back
+                    const offset = (index - activeIndex + photos.length) % photos.length;
+                    const isFront = offset === 0;
 
-                  {/* Inner container wrapper */}
-                  <div className="relative aspect-square w-full rounded-3xl border border-white/10 bg-[#0a0a14] overflow-hidden flex items-center justify-center p-3">
-                    <div className="absolute inset-0 bg-[radial-gradient(#ffffff05_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
+                    const rotation =
+                      offset === 0
+                        ? 0
+                        : offset === 1
+                        ? isHovered
+                          ? 6
+                          : 3.5
+                        : isHovered
+                        ? -6
+                        : -3.5;
 
-                    <img
-                      src={profileImg}
-                      alt="Profile Photo"
-                      className="w-full h-full object-cover rounded-2xl shadow-2xl group-hover:scale-[1.02] transition-transform duration-500"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        const parent = e.currentTarget.parentElement;
-                        if (parent) {
-                          const fallback = parent.querySelector('.photo-fallback');
-                          if (fallback) fallback.classList.remove('hidden');
-                        }
-                      }}
-                    />
+                    const translateX =
+                      offset === 0
+                        ? 0
+                        : offset === 1
+                        ? isHovered
+                          ? 18
+                          : 10
+                        : isHovered
+                        ? -18
+                        : -10;
 
-                    <div className="photo-fallback hidden flex flex-col items-center justify-center text-zinc-500 gap-3">
-                      <User className="w-16 h-16 opacity-30 text-violet-400" />
-                      <span className="text-xs uppercase tracking-widest font-semibold opacity-50">Photo Placeholder</span>
-                    </div>
+                    const translateY = offset * 8;
+                    const scale = 1 - offset * 0.04;
+
+                    return (
+                      <motion.div
+                        key={photo.id}
+                        animate={{
+                          rotate: rotation,
+                          x: translateX,
+                          y: translateY,
+                          scale,
+                          zIndex: photos.length - offset,
+                          opacity: offset === 0 ? 1 : 0.65 - offset * 0.15,
+                        }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 260,
+                          damping: 24,
+                        }}
+                        onClick={() => {
+                          if (isFront) {
+                            nextPhoto();
+                          } else {
+                            setActiveIndex(index);
+                          }
+                        }}
+                        className="absolute inset-0 rounded-2xl overflow-hidden bg-zinc-900 border border-white/10 shadow-2xl cursor-pointer group"
+                      >
+                        <img
+                          src={photo.src}
+                          alt={photo.alt}
+                          className="w-full h-full object-cover"
+                        />
+
+                        {isFront && (
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-end justify-between p-4">
+                            <span className="text-xs font-mono-jb text-zinc-200">
+                              {photo.note}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setLightboxOpen(true);
+                              }}
+                              className="p-2 rounded-full bg-black/70 border border-white/15 text-white hover:bg-black transition-colors"
+                              aria-label="View full size"
+                            >
+                              <Maximize2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        )}
+                      </motion.div>
+                    );
+                  })}
+                </div>
+
+                {/* Minimal Deck Controls */}
+                <div className="flex items-center justify-between mt-6 pt-3 border-t border-white/[0.07]">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono-jb text-xs text-zinc-400">
+                      0{activeIndex + 1} / 0{photos.length}
+                    </span>
+                    <span className="text-zinc-700">&middot;</span>
+                    <span className="text-xs text-zinc-500">
+                      {activePhoto.note}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={prevPhoto}
+                      className="w-8 h-8 rounded-full border border-white/[0.08] flex items-center justify-center text-zinc-400 hover:text-zinc-100 hover:border-white/20 transition-colors cursor-pointer"
+                      aria-label="Previous photo"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={nextPhoto}
+                      className="w-8 h-8 rounded-full border border-white/[0.08] flex items-center justify-center text-zinc-400 hover:text-zinc-100 hover:border-white/20 transition-colors cursor-pointer"
+                      aria-label="Next photo"
+                    >
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
               </RevealItem>
             </div>
 
-            {/* Right: Narrative / Bio Content */}
-            <div className="md:col-span-7 space-y-8">
+            {/* Right: Grounded Bio & Clean Fact Sheet */}
+            <div className="lg:col-span-7 space-y-8">
               <RevealItem direction="right">
-                <div className="space-y-4">
-                  <h3 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
-                    Software Developer & IT Graduate
-                  </h3>
-                  <TypewriterText
-                    text={bio1}
-                    className="text-zinc-400 leading-relaxed font-mono-jb text-[14px]"
-                    speed={35}
-                    startDelay={300}
-                  />
-                  <TypewriterText
-                    text={bio2}
-                    className="text-zinc-400 leading-relaxed font-mono-jb text-[14px]"
-                    speed={35}
-                    startDelay={300 + bio1.length * 35 + 500}
-                  />
+                <div className="space-y-5 text-zinc-300 text-base sm:text-[17px] leading-relaxed">
+                  <p>
+                    I&apos;m an Information Technology graduate from Cebu City with a focus on full-stack web and mobile application development.
+                  </p>
+                  <p className="text-zinc-400 text-sm sm:text-base leading-relaxed">
+                    Most of my work involves building web applications with React, TypeScript, and Laravel/.NET, alongside cross-platform mobile apps in Flutter and Dart. I care about keeping codebases readable, structuring databases properly, and shipping interfaces that feel fast and straightforward to use.
+                  </p>
                 </div>
               </RevealItem>
 
+              {/* Editorial Key-Value Specification Rows */}
               <RevealItem direction="right">
-                <div className="grid sm:grid-cols-3 gap-4">
-                  {infoItems.map((item) => (
+                <div className="border-t border-white/[0.08] divide-y divide-white/[0.07]">
+                  {details.map((item) => (
                     <div
                       key={item.label}
-                      className="p-4 rounded-xl border border-white/5 bg-white/[0.01] backdrop-blur-sm space-y-2 hover:border-white/10 transition-colors"
+                      className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1"
                     >
-                      <item.icon className={`w-5 h-5 ${item.color}`} />
-                      <div>
-                        <div className="text-xs text-zinc-500 uppercase tracking-wider font-semibold">{item.label}</div>
-                        <div className="text-sm font-medium text-white">{item.value}</div>
-                      </div>
+                      <span className="font-mono-jb text-xs uppercase tracking-wider text-zinc-500">
+                        {item.label}
+                      </span>
+                      <span className="text-sm font-medium text-zinc-200">
+                        {item.value}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -185,6 +227,37 @@ export function About() {
           </div>
         </SectionReveal>
       </div>
+
+      {/* Lightbox */}
+      <AnimatePresence>
+        {lightboxOpen && (
+          <motion.div
+            key="about-lightbox"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-md"
+            onClick={() => setLightboxOpen(false)}
+          >
+            <button
+              onClick={() => setLightboxOpen(false)}
+              className="absolute top-6 right-6 w-10 h-10 rounded-full border border-white/15 bg-white/5 hover:bg-white/15 flex items-center justify-center text-zinc-300 hover:text-white transition-colors cursor-pointer"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <motion.img
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              src={activePhoto.src}
+              alt={activePhoto.alt}
+              onClick={(e) => e.stopPropagation()}
+              className="max-w-full max-h-[82vh] object-contain rounded-xl border border-white/10"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
